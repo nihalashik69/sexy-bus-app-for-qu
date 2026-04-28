@@ -1,0 +1,20 @@
+# Firebase / API keys
+android/app/google-services.json
+**/GoogleService-Info.plist
+
+# Env files
+.env
+*.env
+*.env.local
+
+# Keys & credentials
+*.key
+*.pem
+*.p12
+*.p8
+serviceAccountKey.json
+credentials.json
+secrets.json
+
+# Android local config
+local.properties
