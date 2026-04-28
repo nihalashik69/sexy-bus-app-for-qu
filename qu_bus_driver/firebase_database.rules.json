@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "buses": {
+      "$busId": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['busId', 'driverName', 'routeId', 'latitude', 'longitude', 'timestamp', 'status'])"
+      }
+    }
+  }
+}
+
