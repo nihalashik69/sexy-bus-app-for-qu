@@ -52,140 +52,250 @@ class BusService extends ChangeNotifier{
         routes: ['black_line', 'brown_line', 'maroon_line'],
       ),
       
-      // Female Classrooms Building (D06) - Main Hub for Routes
+      // Female Classrooms Building (D06) - Main Hub for Routes (updated)
       BusStop(
         id: 'female_classrooms',
-        name: 'Female Classrooms Building (GCR)',
+        name: 'D06 Female Classrooms Building (GCR)',
         description: 'D06 - Female Classrooms Building',
-        location: const LatLng(25.372171648170337, 51.48486476066063),
+        location: const LatLng(25.373481982344842, 51.4857422195123),
         routes: ['blue_route', 'light_blue_route', 'dark_green_route', 'light_green_route', 'purple_route', 'black_line'],
       ),
       
-      // Women's Activity Center (C05)
+      // Women's Activity Center (C05) (updated)
       BusStop(
         id: 'womens_activity_center',
-        name: 'Women\'s Activity Center',
+        name: 'C05 Women\'s Activity Center',
         description: 'C05 - Women\'s Student Activity Center',
-        location: const LatLng(25.373318147272293, 51.48752343321898),
+        location: const LatLng(25.372089099584354, 51.488961932841086),
         routes: ['blue_route', 'light_blue_route', 'dark_green_route', 'light_green_route', 'pink_route'],
       ),
-      
-      // Library (B13)
-      BusStop(
-        id: 'library',
-        name: 'Library',
-        description: 'B13 - Main University Library',
-        location: const LatLng(25.377533689714024, 51.49026714070395),
-        routes: ['blue_route', 'black_line', 'white_line', 'brown_line'],
-      ),
-      
-      // College of Business and Economics (H08)
-      BusStop(
-        id: 'business',
-        name: 'College of Business and Economics',
-        description: 'H08 - College of Business and Economics',
-        location: const LatLng(25.378395383948423, 51.485941885442955),
-        routes: ['blue_route', 'black_line', 'white_line', 'maroon_line'],
-      ),
-      
-      // College of Engineering (H07)
-      BusStop(
-        id: 'engineering',
-        name: 'College of Engineering',
-        description: 'H07 - College of Engineering',
-        location: const LatLng(25.379161874420934, 51.48791360317812),
-        routes: ['light_blue_route', 'black_line', 'white_line', 'maroon_line', 'orange_route'],
-      ),
-      
-      // College of Education (I10)
-      BusStop(
-        id: 'education',
-        name: 'New College of Education',
-        description: 'I10 - College of Education',
-        location: const LatLng(25.375778325356464, 51.48285963578254),
-        routes: ['dark_green_route', 'black_line', 'white_line'],
-      ),
-      
-      // College of Law (I09)
-      BusStop(
-        id: 'law',
-        name: 'College of Law',
-        description: 'I09 - College of Law',
-        location: const LatLng(25.37498601479011, 51.48144259906941),
-        routes: ['light_green_route', 'black_line', 'white_line', 'orange_route'],
-      ),
+
       
       // Al Razi Building (H12) - Approximate location
       BusStop(
         id: 'al_razi',
-        name: 'Al Razi Building',
+        name: 'H12 Al Razi Building (College of Dental Medicine / Medicine)',
         description: 'H12 - College of Dental Medicine / Medicine',
         location: const LatLng(25.373318147272293, 51.48752343321898), // Using Women's Activity as approximate reference
         routes: ['purple_route', 'pink_route', 'black_line'],
       ),
       
-      // Ibn Al Baitar Building (I06) - Approximate location
+      // Ibn Al Baitar Building (I06) - updated to provided coordinate
       BusStop(
         id: 'ibn_al_baitar',
-        name: 'Ibn Al Baitar Building',
+        name: 'I06 College of Pharmacy (Ibn Al-Baitar)',
         description: 'I06 - College of Pharmacy / Health Sciences',
-        location: const LatLng(25.37498601479011, 51.48144259906941), // Using Law as approximate reference
+        location: const LatLng(25.380643787796444, 51.481912360606444),
         routes: ['purple_route', 'pink_route', 'black_line'],
       ),
       
-      // Tamyuz Simulation Center (I08) - Approximate location
+      // Tamyuz Simulation Center (I08) - updated
       BusStop(
         id: 'tamyuz_center',
-        name: 'Tamyuz Simulation Center',
+        name: 'I08 Tamyuz Simulation Center',
         description: 'I08 - Tamyuz Simulation Center',
-        location: const LatLng(25.375778325356464, 51.48285963578254), // Using Education as approximate reference
+        location: const LatLng(25.37988015721793, 51.482720527517),
         routes: ['orange_route', 'black_line'],
       ),
       
-      // Student Affairs Building (I11)
-      BusStop(
-        id: 'students_affairs',
-        name: 'Student Affairs Building',
-        description: 'I11 - Students Affairs',
-        location: const LatLng(25.377069189896087, 51.48474121692091),
-        routes: ['black_line', 'white_line'],
-      ),
-      
-      // Research Complex (H10)
+      // Research Complex (H10) (updated)
       BusStop(
         id: 'research_complex',
         name: 'Research Complex',
         description: 'H10 - Research Complex',
-        location: const LatLng(25.379784924283847, 51.4898780698433),
+        location: const LatLng(25.379627085925716, 51.49016028066605),
         routes: ['black_line', 'brown_line'],
       ),
       
-      // Information Technology Services (B03)
+      // Information Technology Services (B03) (updated)
       BusStop(
         id: 'it_services',
-        name: 'Information Technology Services',
+        name: 'B03 Information Technology Services',
         description: 'B03 - ITS Building',
-        location: const LatLng(25.374577061639478, 51.49314222276258),
+        location: const LatLng(25.37524774172289, 51.492901227889526),
         routes: ['black_line', 'white_line', 'brown_line'],
       ),
       
-      // Men's Foundation Building (A06)
+      // Men's Foundation Building (A06) (updated)
       BusStop(
         id: 'mens_foundation',
-        name: 'Men\'s Foundation Building',
+        name: 'A06 Men\'s Foundation Building',
         description: 'A06 - Men\'s Foundation Building',
-        location: const LatLng(25.378368563094583, 51.49158593932738),
+        location: const LatLng(25.378124440299285, 51.49158060045566),
         routes: ['black_line'],
       ),
       
-      // Sports Facilities Department (A07)
+      // Sports Facilities Department (A07) (updated)
       BusStop(
         id: 'sports_facilities',
-        name: 'Sports and Events Complex',
+        name: 'A07 Sports and Events Complex',
         description: 'A07 - Sports and Events Complex',
-        location: const LatLng(25.377006581555843, 51.493157551764284),
+        location: const LatLng(25.377296788397643, 51.49312032574497),
         routes: ['brown_line'],
       ),
+
+      // --- New / variant stops added (routes left blank as requested) ---
+
+      // College of Law - male/female variants
+      BusStop(
+        id: 'law_male',
+        name: 'I09 College of Law (Male)',
+        description: 'I09 - College of Law (Male)',
+        location: const LatLng(25.376087457119596, 51.48069196590328),
+        routes: [],
+      ),
+      BusStop(
+        id: 'law_female',
+        name: 'I09 College of Law (Female)',
+        description: 'I09 - College of Law (Female)',
+        location: const LatLng(25.374783619645747, 51.481530834481795),
+        routes: [],
+      ),
+
+      // College of Education - male/female variants
+      BusStop(
+        id: 'education_male',
+        name: 'I10 College of Education (Male)',
+        description: 'I10 - College of Education (Male)',
+        location: const LatLng(25.37658898975716, 51.4828877414271),
+        routes: [],
+      ),
+      BusStop(
+        id: 'education_female',
+        name: 'I10 College of Education (Female)',
+        description: 'I10 - College of Education (Female)',
+        location: const LatLng(25.37560672476257, 51.48242239454162),
+        routes: [],
+      ),
+
+      // Student Affairs - male/female variants
+      BusStop(
+        id: 'students_affairs_male',
+        name: 'I11 Student Affairs Building (Male)',
+        description: 'I11 - Student Affairs (Male)',
+        location: const LatLng(25.377979388163364, 51.48388511757748),
+        routes: [],
+      ),
+      BusStop(
+        id: 'students_affairs_female',
+        name: 'I11 Student Affairs Building (Female)',
+        description: 'I11 - Student Affairs (Female)',
+        location: const LatLng(25.376323831360903, 51.48494350153811),
+        routes: [],
+      ),
+
+      // College of Nursing (new)
+      BusStop(
+        id: 'nursing',
+        name: 'I03 College of Nursing',
+        description: 'I03 - College of Nursing',
+        location: const LatLng(25.378817713816293, 51.48342119215998),
+        routes: [],
+      ),
+
+      // College of Pharmacy (Ibn Al-Baitar) - added as updated above; also add explicit male/female not provided (keep single entry)
+
+      // College of Business and Economics - male/female variants
+      BusStop(
+        id: 'business_male',
+        name: 'H08 College of Business and Economics (Male)',
+        description: 'H08 - College of Business and Economics (Male)',
+        location: const LatLng(25.378627213100078, 51.485784586139374),
+        routes: [],
+      ),
+      BusStop(
+        id: 'business_female',
+        name: 'H08 College of Business and Economics (Female)',
+        description: 'H08 - College of Business and Economics (Female)',
+        location: const LatLng(25.3767535825156, 51.48698055938411),
+        routes: [],
+      ),
+
+      // College of Engineering - male/female variants
+      BusStop(
+        id: 'engineering_male',
+        name: 'H07 College of Engineering (Male)',
+        description: 'H07 - College of Engineering (Male)',
+        location: const LatLng(25.380083667560896, 51.48692088481661),
+        routes: [],
+      ),
+      BusStop(
+        id: 'engineering_female',
+        name: 'H07 College of Engineering (Female)',
+        description: 'H07 - College of Engineering (Female)',
+        location: const LatLng(25.378934489421194, 51.48663916055145),
+        routes: [],
+      ),
+
+      // Research Complex - already updated above (no duplicate)
+
+      // College Of Medicine (H12) - new
+      BusStop(
+        id: 'college_of_medicine',
+        name: 'H12 College of Medicine',
+        description: 'H12 - College of Medicine',
+        location: const LatLng(25.38046481732248, 51.491811717125984),
+        routes: [],
+      ),
+
+      // Library - male/female variants
+      BusStop(
+        id: 'library_male',
+        name: 'B13 Library (Male)',
+        description: 'B13 - Library (Male)',
+        location: const LatLng(25.377661503696263, 51.49047014057098),
+        routes: [],
+      ),
+      BusStop(
+        id: 'library_female',
+        name: 'B13 Library (Female)',
+        description: 'B13 - Library (Female)',
+        location: const LatLng(25.37750423808213, 51.488897080467154),
+        routes: [],
+      ),
+
+      // Women's Foundation (D05)
+      BusStop(
+        id: 'womens_foundation',
+        name: 'D05 Women\'s Foundation',
+        description: 'D05 - Women\'s Foundation',
+        location: const LatLng(25.374760002402123, 51.48711292847968),
+        routes: [],
+      ),
+
+      // Women's Food Court (D04)
+      BusStop(
+        id: 'womens_food_court',
+        name: 'D04 Women\'s Food Court',
+        description: 'D04 - Women\'s Food Court',
+        location: const LatLng(25.37367115319947, 51.48777028639902),
+        routes: [],
+      ),
+
+      // College of Sharia & Islamic Studies (Bldn A) (C11)
+      BusStop(
+        id: 'sharia_a',
+        name: 'C11 College of Sharia & Islamic Studies (Bldn A)',
+        description: 'C11 - College of Sharia & Islamic Studies (Building A)',
+        location: const LatLng(25.374296317071014, 51.48757258895679),
+        routes: [],
+      ),
+
+      // College of Sharia & Islamic Studies (Bldn B) (C07)
+      BusStop(
+        id: 'sharia_b',
+        name: 'C07 College of Sharia & Islamic Studies (Bldn B)',
+        description: 'C07 - College of Sharia & Islamic Studies (Building B)',
+        location: const LatLng(25.373260616357925, 51.48825006414136),
+        routes: [],
+      ),
+
+      // Information Technology Services (B03) already updated above
+
+      // Sports Facilities and Events Department (A07) already updated above
+
+      // Tamayuz Simulation Center (I08) already updated above
+
     ]);
   }
 
