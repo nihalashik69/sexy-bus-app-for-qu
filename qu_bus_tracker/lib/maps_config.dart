@@ -7,5 +7,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapsConfig {
-  static const double campusMarkerHue = BitmapDescriptor.hueGreen;
+  // Use blue hue for campus location markers
+  static const double campusMarkerHue = BitmapDescriptor.hueBlue;
 }

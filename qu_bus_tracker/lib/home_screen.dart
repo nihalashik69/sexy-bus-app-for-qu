@@ -39,42 +39,14 @@ class _HomeScreenState extends State<HomeScreen> {
   final DraggableScrollableController _busesListSheetController = DraggableScrollableController();
   bool _showAllBuses = false; // Toggle to show all live buses
   final Map<String, BitmapDescriptor> _busIconCache = {}; // Cache for bus icons by route color (key: color value as string)
+  BitmapDescriptor? _stopIcon; // Cached custom stop icon (blue)
 
   // Qatar University campus bounds
   static const LatLng _quCenter = LatLng(25.376453, 51.488121);
   static const double _quZoom = 16.0;
 
-  // Official QU campus locations (based on official bus routes)
-  static const Map<String, LatLng> _campusLocations = {
-    // Main Hub
-    'Metro Station': LatLng(25.381821556363867,51.493005795317956),
-    
-    // Major Hubs for Bus Routes
-    'Female Classrooms Building (GCR)': LatLng(25.372171648170337,51.48486476066063),
-    'Male Classrooms Building (BCR)': LatLng(25.374935002833045,51.4908238607636),
-    'Women\'s Activity Center': LatLng(25.373318147272293,51.48752343321898),
-    
-    // Academic Buildings
-    'Library': LatLng(25.377533689714024,51.49026714070395),
-    'College of Engineering': LatLng(25.379161874420934,51.48791360317812),
-    'College of Business and Economics': LatLng(25.378395383948423,51.485941885442955),
-    'New College of Education': LatLng(25.375778325356464,51.48285963578254),
-    'College of Law': LatLng(25.37498601479011, 51.48144259906941),
-    
-    // Health Sciences
-    //'Al Razi Building': LatLng(25.3695, 51.4830),
-    //'Ibn Al Baitar Building': LatLng(25.3685, 51.4828),
-    //'Tamyuz Simulation Center': LatLng(25.3680, 51.4815),
-    
-    // Administrative & Services
-    'Student Affairs Building': LatLng(25.377069189896087, 51.48474121692091),
-    'Research Complex': LatLng(25.379784924283847,51.4898780698433),
-    'Information Technology Services': LatLng(25.374577061639478,51.49314222276258),
-    'Men\'s Foundation Building': LatLng(25.378368563094583,51.49158593932738),
-    
-    // Sports Facilities
-    'Sports and Events Complex': LatLng(25.377006581555843,51.493157551764284),
-  };
+  // Official QU campus locations (populated from BusService)
+  Map<String, LatLng> _campusLocations = {};
 
   @override
   void initState() {
@@ -103,6 +75,20 @@ class _HomeScreenState extends State<HomeScreen> {
       final busService = Provider.of<BusService>(context, listen: false);
       // No local mock buses required; routes/stops are initialized on demand
       await busService.initializeMockData();
+
+      // Populate campus locations from BusService stops (so UI reflects updated stops)
+      final stops = busService.getAllStops();
+      if (stops.isNotEmpty) {
+        final map = <String, LatLng>{};
+        for (var s in stops) {
+          map[s.name] = s.location;
+        }
+        if (mounted) {
+          setState(() {
+            _campusLocations = map;
+          });
+        }
+      }
     } catch (e) {
       // If provider isn't available or initialization fails, log and continue
       debugPrint('BusService init error: $e');
@@ -276,11 +262,26 @@ class _HomeScreenState extends State<HomeScreen> {
     // Add campus location markers
     for (String location in _campusLocations.keys) {
       if (location != _selectedDestination) {
+        // Determine icon: use cached custom stop icon if available, otherwise use default hue and create the custom icon async
+        BitmapDescriptor stopIcon = BitmapDescriptor.defaultMarkerWithHue(MapsConfig.campusMarkerHue);
+        if (_stopIcon != null) {
+          stopIcon = _stopIcon!;
+        } else {
+          // Create and cache stop icon asynchronously
+          _createStopIcon().then((icon) {
+            if (mounted) {
+              setState(() {
+                _stopIcon = icon;
+              });
+            }
+          });
+        }
+
         markers.add(
           Marker(
             markerId: MarkerId('campus_$location'),
             position: _campusLocations[location]!,
-            icon: BitmapDescriptor.defaultMarkerWithHue(MapsConfig.campusMarkerHue),
+            icon: stopIcon,
             infoWindow: InfoWindow(
               title: location,
               snippet: 'Tap to select as destination',
@@ -450,11 +451,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Create custom bus icon bitmap
+  // Create custom bus icon bitmap (double size)
   Future<BitmapDescriptor> _createBusIcon(Color routeColor) async {
     final pictureRecorder = ui.PictureRecorder();
     final canvas = Canvas(pictureRecorder);
-    final size = 80.0; // Icon size
+    final size = 160.0; // Icon size (double)
     
     // Draw bus body (rectangle with rounded corners)
     final busPaint = Paint()
@@ -462,8 +463,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ..style = PaintingStyle.fill;
     
     final busRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(10, 20, 60, 40),
-      const Radius.circular(8),
+      Rect.fromLTWH(20, 40, 120, 80),
+      const Radius.circular(16),
     );
     canvas.drawRRect(busRect, busPaint);
     
@@ -475,8 +476,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // Front window
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(15, 25, 15, 12),
-        const Radius.circular(3),
+        Rect.fromLTWH(30, 50, 30, 24),
+        const Radius.circular(6),
       ),
       windowPaint,
     );
@@ -484,8 +485,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // Back window
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(50, 25, 15, 12),
-        const Radius.circular(3),
+        Rect.fromLTWH(100, 50, 30, 24),
+        const Radius.circular(6),
       ),
       windowPaint,
     );
@@ -495,16 +496,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ..color = Colors.black
       ..style = PaintingStyle.fill;
     
-    canvas.drawCircle(const Offset(25, 65), 6, wheelPaint);
-    canvas.drawCircle(const Offset(55, 65), 6, wheelPaint);
+    canvas.drawCircle(const Offset(50, 130), 12, wheelPaint);
+    canvas.drawCircle(const Offset(110, 130), 12, wheelPaint);
     
     // Draw white center for wheels
     final wheelCenterPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.fill;
     
-    canvas.drawCircle(const Offset(25, 65), 3, wheelCenterPaint);
-    canvas.drawCircle(const Offset(55, 65), 3, wheelCenterPaint);
+    canvas.drawCircle(const Offset(50, 130), 6, wheelCenterPaint);
+    canvas.drawCircle(const Offset(110, 130), 6, wheelCenterPaint);
     
     // Convert to image
     final picture = pictureRecorder.endRecording();
@@ -513,6 +514,46 @@ class _HomeScreenState extends State<HomeScreen> {
     final uint8List = byteData!.buffer.asUint8List();
     
     return BitmapDescriptor.fromBytes(uint8List);
+  }
+
+  // Create a bus-stop icon (blue pin with white bus symbol) - larger size
+  Future<BitmapDescriptor> _createStopIcon() async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    const size = 128.0; // doubled
+
+    // Draw blue pin circle
+    final pinPaint = Paint()
+      ..color = Colors.blue
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(const Offset(size/2, size/2 - 12), 32, pinPaint);
+
+    // Draw small white bus rectangle inside the pin
+    final busPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size/2 - 20, size/2 - 24, 40, 24),
+        const Radius.circular(6),
+      ),
+      busPaint,
+    );
+
+    // Draw the pin tail (triangle)
+    final tailPaint = Paint()..color = Colors.blue;
+    final path = Path()
+      ..moveTo(size/2 - 16, size/2 + 16)
+      ..lineTo(size/2 + 16, size/2 + 16)
+      ..lineTo(size/2, size - 8)
+      ..close();
+    canvas.drawPath(path, tailPaint);
+
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(size.toInt(), size.toInt());
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final bytes = byteData!.buffer.asUint8List();
+    return BitmapDescriptor.fromBytes(bytes);
   }
 
   @override
@@ -530,6 +571,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : Consumer<FirebaseBusService>(
                   builder: (context, firebaseBusService, child) {
                     return GoogleMap(
+                      mapType: MapType.hybrid,
                       onMapCreated: _onMapCreated,
                       initialCameraPosition: const CameraPosition(
                         target: _quCenter,
@@ -539,7 +581,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       myLocationEnabled: true,
                       myLocationButtonEnabled: false,
                       zoomControlsEnabled: false,
-                      mapType: MapType.satellite,
                       onTap: (LatLng position) {
                         // Clear destination selection and close sheet when tapping on map
                         setState(() {
@@ -555,6 +596,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         }
                       },
+
                     );
                   },
                 ),
