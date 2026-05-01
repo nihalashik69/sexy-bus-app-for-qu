@@ -23,7 +23,9 @@ import 'location_service.dart';
 import 'maps_config.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String gender;
+
+  const HomeScreen({super.key, required this.gender});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -40,6 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showAllBuses = false; // Toggle to show all live buses
   final Map<String, BitmapDescriptor> _busIconCache = {}; // Cache for bus icons by route color (key: color value as string)
   BitmapDescriptor? _stopIcon; // Cached custom stop icon (blue)
+  final TextEditingController _searchController = TextEditingController();
+  Map<String, String?> _stopGenders = {};
 
   // Qatar University campus bounds
   static const LatLng _quCenter = LatLng(25.376453, 51.488121);
@@ -47,6 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Official QU campus locations (populated from BusService)
   Map<String, LatLng> _campusLocations = {};
+
+  // Helper to check if stop should show for current gender
+  bool _shouldShowStop(String stopName) {
+    final gender = _stopGenders[stopName];
+    if (gender == null) return true;
+    if (gender == widget.gender) return true;
+    return false;
+  }
 
   @override
   void initState() {
@@ -76,16 +88,19 @@ class _HomeScreenState extends State<HomeScreen> {
       // No local mock buses required; routes/stops are initialized on demand
       await busService.initializeMockData();
 
-      // Populate campus locations from BusService stops (so UI reflects updated stops)
+      // Populate campus locations from BusService stops
       final stops = busService.getAllStops();
       if (stops.isNotEmpty) {
         final map = <String, LatLng>{};
+        final genderMap = <String, String?>{};
         for (var s in stops) {
           map[s.name] = s.location;
+          genderMap[s.name] = s.gender;
         }
         if (mounted) {
           setState(() {
             _campusLocations = map;
+            _stopGenders = genderMap;
           });
         }
       }
@@ -153,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const DestinationSelectionScreen(),
+        builder: (context) => DestinationSelectionScreen(gender: widget.gender),
       ),
     );
 
@@ -779,13 +794,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            _showAllBuses ? Icons.visibility_off : Icons.directions_bus,
+                            _showAllBuses ? Icons.close : Icons.search,
                             color: _showAllBuses ? Colors.white : const Color(0xFF8B0000),
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            _showAllBuses ? 'Hide Live Buses' : 'Show All Live Buses',
+                            _showAllBuses ? 'Hide Bus-Stops' : 'Search Bus-Stops',
                             style: TextStyle(
                               color: _showAllBuses ? Colors.white : const Color(0xFF8B0000),
                               fontSize: 14,
@@ -1000,17 +1015,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Live Buses List Sheet (slides up from bottom)
+// Search Bus Stops Sheet (slides up from bottom)
           DraggableScrollableSheet(
             controller: _busesListSheetController,
-            initialChildSize: 0.0, // Hidden initially
+            initialChildSize: 0.0,
             minChildSize: 0.0,
-            maxChildSize: 0.75, // Maximum 75% of screen
+            maxChildSize: 0.85,
             snap: true,
-            snapSizes: const [0.4, 0.75], // Snap points
+            snapSizes: const [0.5, 0.85],
             builder: (context, scrollController) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16), // Make sheet narrower
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -1028,21 +1043,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Column(
                     children: [
-                      // Drag handle (larger and more prominent)
                       GestureDetector(
                         onTap: () {
-                          // Toggle between snap sizes when handle is tapped
                           if (_busesListSheetController.isAttached) {
                             final currentSize = _busesListSheetController.size;
                             if (currentSize < 0.6) {
                               _busesListSheetController.animateTo(
-                                0.75,
+                                0.85,
                                 duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeOut,
                               );
                             } else {
                               _busesListSheetController.animateTo(
-                                0.4,
+                                0.5,
                                 duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeIn,
                               );
@@ -1059,239 +1072,165 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                    // Header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.directions_bus,
-                            color: Color(0xFF8B0000),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Consumer<FirebaseBusService>(
-                              builder: (context, firebaseBusService, child) {
-                                final allBuses = firebaseBusService.getAllActiveBuses();
-                                return Text(
-                                  'Live Buses (${allBuses.length})',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2C2C2C),
-                                  ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.search,
+                              color: Color(0xFF8B0000),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            const Expanded(
+                              child: Text(
+                                'Search Bus Stops',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2C2C2C),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close, color: Color(0xFF8B0000)),
+                              onPressed: () {
+                                setState(() {
+                                  _showAllBuses = false;
+                                });
+                                _busesListSheetController.animateTo(
+                                  0.0,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeIn,
                                 );
                               },
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close, color: Color(0xFF8B0000)),
-                            onPressed: () {
-                              setState(() {
-                                _showAllBuses = false;
-                              });
-                              _busesListSheetController.animateTo(
-                                0.0,
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeIn,
-                              );
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const Divider(),
-                    // Bus list
-                    Expanded(
-                      child: Consumer<FirebaseBusService>(
-                        builder: (context, firebaseBusService, child) {
-                          final allBuses = firebaseBusService.getAllActiveBuses();
-                          
-                          if (allBuses.isEmpty) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.directions_bus_outlined,
-                                    size: 64,
-                                    color: Colors.grey[300],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'No buses currently active',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey[600],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Search for a bus stop...',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[100],
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          onChanged: (value) {
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(height: 1),
+                      Expanded(
+                        child: Consumer<BusService>(
+                          builder: (context, busService, child) {
+                            final allStops = busService.getAllStops();
+                            final searchQuery = _searchController.text;
+                            
+                            final filteredStops = allStops.where((stop) {
+                              final matchesSearch = searchQuery.isEmpty || 
+                                  stop.name.toLowerCase().contains(searchQuery.toLowerCase());
+                              return matchesSearch && _shouldShowStop(stop.name);
+                            }).toList();
+
+                            if (filteredStops.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.search_off,
+                                      size: 64,
+                                      color: Colors.grey[300],
                                     ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Check back soon!',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[400],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          
-                          // Get route names from BusService
-                          final busService = Provider.of<BusService>(context, listen: false);
-                          final allRoutes = busService.getAllRoutes();
-                          
-                          return ListView.builder(
-                            controller: scrollController,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            itemCount: allBuses.length,
-                            itemBuilder: (context, index) {
-                              final bus = allBuses[index];
-                              final route = allRoutes.firstWhere(
-                                (r) => r.id == bus.routeId,
-                                orElse: () => BusRoute(
-                                  id: bus.routeId,
-                                  name: bus.routeId,
-                                  description: '',
-                                  color: '#000000',
-                                  stopIds: [],
-                                  estimatedDuration: const Duration(minutes: 0),
-                                ),
-                              );
-                              
-                              // Parse route color
-                              Color routeColor;
-                              try {
-                                routeColor = Color(int.parse(route.color.replaceFirst('#', '0xFF')));
-                              } catch (e) {
-                                routeColor = Colors.grey;
-                              }
-                              
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(12),
-                                  onTap: () {
-                                    // Could navigate to bus details or center map on bus
-                                  },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                                      child: Row(
-                                        children: [
-                                          // Route color indicator
-                                          Container(
-                                            width: 4,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              color: routeColor,
-                                              borderRadius: BorderRadius.circular(2),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          // Bus icon
-                                          Container(
-                                            padding: const EdgeInsets.all(6),
-                                            decoration: BoxDecoration(
-                                              color: Colors.green[50],
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: Icon(
-                                                Icons.directions_bus,
-                                                color: Colors.green[700],
-                                              size: 20,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          // Bus info
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Flexible(
-                                                      child: Text(
-                                                        route.name,
-                                                        style: const TextStyle(
-                                                          fontSize: 13,
-                                                          fontWeight: FontWeight.w600,
-                                                          color: Color(0xFF2C2C2C),
-                                                        ),
-                                                        overflow: TextOverflow.ellipsis,
-                                                        maxLines: 1,
-                                                      ),
-                                                    ),
-                                                    // No mock label — only live buses provided by backend
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 2),
-                                                Text(
-                                                  'Driver: ${bus.driverName}',
-                                                  style: TextStyle(
-                                                    fontSize: 11,
-                                                    color: Colors.grey[600],
-                                                  ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                ),
-                                                const SizedBox(height: 1),
-                                                Text(
-                                                  'Status: ${bus.status.toString().split('.').last}',
-                                                  style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey[500],
-                                                  ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          // Status indicator
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: [
-                                              Icon(
-                                                Icons.circle,
-                                                size: 10,
-                                                color: bus.status == BusStatus.running 
-                                                    ? Colors.green 
-                                                    : Colors.grey,
-                                              ),
-                                              const SizedBox(height: 2),
-                                              Text(
-                                                '${(bus.estimatedArrival?.difference(DateTime.now()).inMinutes ?? 5).abs()} min',
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.grey[700],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'No bus stops found',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey[600],
                                       ),
                                     ),
+                                  ],
                                 ),
                               );
-                            },
-                          );
-                        },
+                            }
+
+                            return ListView.builder(
+                              controller: scrollController,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              itemCount: filteredStops.length,
+                              itemBuilder: (context, index) {
+                                final stop = filteredStops[index];
+                                return Card(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  elevation: 1,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListTile(
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF8B0000).withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.location_on,
+                                        color: Color(0xFF8B0000),
+                                        size: 20,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      stop.name,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      stop.description,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedDestination = stop.name;
+                                        _selectedMarkerLocation = stop.name;
+                                      });
+                                      if (_campusLocations.containsKey(stop.name)) {
+                                        _mapController?.animateCamera(
+                                          CameraUpdate.newLatLng(_campusLocations[stop.name]!),
+                                        );
+                                      }
+                                      _busesListSheetController.animateTo(
+                                        0.0,
+                                        duration: const Duration(milliseconds: 300),
+                                        curve: Curves.easeIn,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
+              );
             },
           ),
         ],
@@ -1301,6 +1240,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     _detailsSheetController.dispose();
     _busesListSheetController.dispose();
     super.dispose();

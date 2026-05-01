@@ -15,7 +15,9 @@ import 'bus_models.dart';
 import 'dart:math' as math;
 
 class DestinationSelectionScreen extends StatefulWidget {
-  const DestinationSelectionScreen({super.key});
+  final String gender;
+
+  const DestinationSelectionScreen({super.key, required this.gender});
 
   @override
   State<DestinationSelectionScreen> createState() => _DestinationSelectionScreenState();
@@ -62,8 +64,22 @@ class _DestinationSelectionScreenState extends State<DestinationSelectionScreen>
   };
 
   List<String> get _allLocations {
+    final busService = BusService();
+    final allStops = busService.getAllStops();
+    
+    // Build a map of stop name to gender
+    final stopGenderMap = <String, String?>{};
+    for (var stop in allStops) {
+      stopGenderMap[stop.name] = stop.gender;
+    }
+    
     return _campusLocations.values
         .expand((category) => category.map((location) => location['name']!))
+        .where((name) {
+          final gender = stopGenderMap[name];
+          if (gender == null) return true;
+          return gender == widget.gender;
+        })
         .toList();
   }
 

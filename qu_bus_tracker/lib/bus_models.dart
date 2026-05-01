@@ -20,6 +20,7 @@ class BusStop {
   final String description;
   final LatLng location;
   final List<String> routes; // Route IDs that pass through this stop
+  final String? gender; // 'male', 'female', or null for all
 
   BusStop({
     required this.id,
@@ -27,6 +28,7 @@ class BusStop {
     required this.description,
     required this.location,
     required this.routes,
+    this.gender,
   });
 
   factory BusStop.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,7 @@ class BusStop {
         json['location']['lng'],
       ),
       routes: List<String>.from(json['routes']),
+      gender: json['gender'],
     );
   }
 
@@ -52,6 +55,7 @@ class BusStop {
         'lng': location.longitude,
       },
       'routes': routes,
+      'gender': gender,
     };
   }
 }

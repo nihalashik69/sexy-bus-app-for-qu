@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'home_screen.dart';
+import 'gender_selection_screen.dart';
 import 'bus_service.dart';
 import 'firebase_bus_service.dart';
 
@@ -85,7 +85,7 @@ class QUBusTrackerApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const HomeScreen(),
+        home: const GenderSelectionScreen(),
         debugShowCheckedModeBanner: false,
       ),
     );
