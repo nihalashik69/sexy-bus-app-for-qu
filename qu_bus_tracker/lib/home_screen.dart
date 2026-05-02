@@ -305,9 +305,9 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    // Add campus location markers
+    // Add campus location markers (filtered by gender)
     for (String location in _campusLocations.keys) {
-      if (location != _selectedDestination) {
+      if (location != _selectedDestination && _shouldShowStop(location)) {
         // Determine icon: use cached custom stop icon if available, otherwise use default hue and create the custom icon async
         BitmapDescriptor stopIcon = BitmapDescriptor.defaultMarkerWithHue(MapsConfig.campusMarkerHue);
         if (_stopIcon != null) {

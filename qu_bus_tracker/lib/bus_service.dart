@@ -43,7 +43,7 @@ class BusService extends ChangeNotifier{
 
   Future<void> _createMockStops() async {
     _stops.addAll([
-      // Metro Station (Main Hub) - All genders
+// Metro Station (Main Hub) - All genders
       BusStop(
         id: 'metro',
         name: 'Metro Station',
@@ -66,13 +66,13 @@ class BusService extends ChangeNotifier{
       // Women's Activity Center (C05) - Female Only
       BusStop(
         id: 'womens_activity_center',
-        name: 'C05 Women\'s Activity Center',
-        description: 'C05 - Women\'s Student Activity Center',
+        name: 'C05 Women\'s Activity Building',
+        description: 'C05 - Women\'s Activity Building',
         location: const LatLng(25.372089099584354, 51.488961932841086),
         routes: ['blue_route', 'light_blue_route', 'dark_green_route', 'light_green_route', 'pink_route'],
         gender: 'female',
-),
-       
+      ),
+        
       // Ibn Al Baitar Building (I06) - All genders
       BusStop(
         id: 'ibn_al_baitar',
@@ -86,8 +86,8 @@ class BusService extends ChangeNotifier{
       // Tamyuz Simulation Center (I08) - All genders
       BusStop(
         id: 'tamyuz_center',
-        name: 'I08 Tamyuz Simulation Center',
-        description: 'I08 - Tamyuz Simulation Center',
+        name: 'I08 Tamayuz Simulation Center',
+        description: 'I08 - Tamayuz Simulation Center',
         location: const LatLng(25.37988015721793, 51.482720527517),
         routes: ['orange_route', 'black_line'],
         gender: null,
@@ -126,8 +126,8 @@ class BusService extends ChangeNotifier{
       // Sports Facilities Department (A07) - All genders
       BusStop(
         id: 'sports_facilities',
-        name: 'A07 Sports and Events Complex',
-        description: 'A07 - Sports and Events Complex',
+        name: 'A07 Sports Facilities and Events Department',
+        description: 'A07 - Sports Facilities and Events Department',
         location: const LatLng(25.377296788397643, 51.49312032574497),
         routes: ['brown_line'],
         gender: null,
@@ -157,8 +157,8 @@ class BusService extends ChangeNotifier{
       // College of Education - Male
       BusStop(
         id: 'education_male',
-        name: 'I10 College of Education (Male)',
-        description: 'I10 - College of Education (Male)',
+        name: 'I10 College of Education Building (Male)',
+        description: 'I10 - College of Education Building (Male)',
         location: const LatLng(25.37658898975716, 51.4828877414271),
         routes: [],
         gender: 'male',
@@ -166,8 +166,8 @@ class BusService extends ChangeNotifier{
       // College of Education - Female
       BusStop(
         id: 'education_female',
-        name: 'I10 College of Education (Female)',
-        description: 'I10 - College of Education (Female)',
+        name: 'I10 College of Education Building (Female)',
+        description: 'I10 - College of Education Building (Female)',
         location: const LatLng(25.37560672476257, 51.48242239454162),
         routes: [],
         gender: 'female',
@@ -177,7 +177,7 @@ class BusService extends ChangeNotifier{
       BusStop(
         id: 'students_affairs_male',
         name: 'I11 Student Affairs Building (Male)',
-        description: 'I11 - Student Affairs (Male)',
+        description: 'I11 - Student Affairs Building (Male)',
         location: const LatLng(25.377979388163364, 51.48388511757748),
         routes: [],
         gender: 'male',
@@ -186,7 +186,7 @@ class BusService extends ChangeNotifier{
       BusStop(
         id: 'students_affairs_female',
         name: 'I11 Student Affairs Building (Female)',
-        description: 'I11 - Student Affairs (Female)',
+        description: 'I11 - Student Affairs Building (Female)',
         location: const LatLng(25.376323831360903, 51.48494350153811),
         routes: [],
         gender: 'female',
@@ -224,8 +224,8 @@ class BusService extends ChangeNotifier{
       // College of Engineering - Male
       BusStop(
         id: 'engineering_male',
-        name: 'H07 College of Engineering (Male)',
-        description: 'H07 - College of Engineering (Male)',
+        name: 'H07 College Of Engineering (Male)',
+        description: 'H07 - College Of Engineering (Male)',
         location: const LatLng(25.380083667560896, 51.48692088481661),
         routes: [],
         gender: 'male',
@@ -233,8 +233,8 @@ class BusService extends ChangeNotifier{
       // College of Engineering - Female
       BusStop(
         id: 'engineering_female',
-        name: 'H07 College of Engineering (Female)',
-        description: 'H07 - College of Engineering (Female)',
+        name: 'H07 College Of Engineering (Female)',
+        description: 'H07 - College Of Engineering (Female)',
         location: const LatLng(25.378934489421194, 51.48663916055145),
         routes: [],
         gender: 'female',
@@ -243,8 +243,8 @@ class BusService extends ChangeNotifier{
       // College Of Medicine - All genders
       BusStop(
         id: 'college_of_medicine',
-        name: 'H12 College of Medicine',
-        description: 'H12 - College of Medicine',
+        name: 'H12 College Of Medicine',
+        description: 'H12 - College Of Medicine',
         location: const LatLng(25.38046481732248, 51.491811717125984),
         routes: [],
         gender: null,
