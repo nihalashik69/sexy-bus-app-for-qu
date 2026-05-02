@@ -96,7 +96,7 @@ class BusService extends ChangeNotifier{
       // Research Complex (H10) - All genders
       BusStop(
         id: 'research_complex',
-        name: 'Research Complex',
+        name: 'H10 Research Complex',
         description: 'H10 - Research Complex',
         location: const LatLng(25.379627085925716, 51.49016028066605),
         routes: ['black_line', 'brown_line'],

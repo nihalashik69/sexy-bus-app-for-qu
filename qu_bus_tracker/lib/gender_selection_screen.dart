@@ -14,6 +14,14 @@ class GenderSelectionScreen extends StatefulWidget {
 
 class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -127,22 +135,11 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
     await firebaseBusService.initialize();
   }
 
-  void _navigateToHome(String gender) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
+  void _navigateToHome(String gender) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(gender: gender),
+      ),
     );
-    
-    await _preloadData();
-    
-    if (mounted) {
-      Navigator.of(context).pop();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(gender: gender),
-        ),
-      );
-    }
   }
 }

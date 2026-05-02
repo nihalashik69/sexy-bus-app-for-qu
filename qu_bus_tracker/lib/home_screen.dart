@@ -10,6 +10,7 @@
 /// - Manage UI sheets for route/bus details and lists
 /// - Handle navigation to `BusDetailsScreen` and destination picker
 
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -44,6 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   BitmapDescriptor? _stopIcon; // Cached custom stop icon (blue)
   final TextEditingController _searchController = TextEditingController();
   Map<String, String?> _stopGenders = {};
+  Timer? _clockTimer;
+  String _currentTime = '';
 
   // Qatar University campus bounds
   static const LatLng _quCenter = LatLng(25.376453, 51.488121);
@@ -60,9 +63,21 @@ class _HomeScreenState extends State<HomeScreen> {
     return false;
   }
 
+  void _updateClock() {
+    final now = DateTime.now();
+    final hour = now.hour > 12 ? now.hour - 12 : (now.hour == 0 ? 12 : now.hour);
+    final minute = now.minute.toString().padLeft(2, '0');
+    final period = now.hour >= 12 ? 'PM' : 'AM';
+    setState(() {
+      _currentTime = '$hour:$minute $period';
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _updateClock();
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) => _updateClock());
     // Listen to details sheet controller to detect when fully closed
     _detailsSheetController.addListener(() {
       if (_detailsSheetController.size <= 0.01) {
@@ -161,6 +176,22 @@ class _HomeScreenState extends State<HomeScreen> {
       await _mapController!.animateCamera(CameraUpdate.zoomOut());
     } catch (e) {
       debugPrint('Zoom out error: $e');
+    }
+  }
+
+  Future<void> _resetMapPosition() async {
+    if (_mapController == null) return;
+    try {
+      await _mapController!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          const CameraPosition(
+            target: _quCenter,
+            zoom: _quZoom,
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Reset map position error: $e');
     }
   }
 
@@ -616,9 +647,49 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
 
+          // Clock showing current time (small rectangle above destination button)
+          Positioned(
+            top: 60,
+            left: 20,
+            right: 20,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF8B0000),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.access_time,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _currentTime,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           // Destination Selection Button (moved to top)
           Positioned(
-            top: 80,
+            top: 100,
             left: 20,
             right: 20,
             child: Container(
@@ -698,52 +769,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-            ),
-          ),
-
-          // Firebase Connection Status
-          Positioned(
-            top: 20,
-            left: 20,
-            right: 20,
-            child: Consumer<FirebaseBusService>(
-              builder: (context, firebaseBusService, child) {
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: firebaseBusService.isConnected ? Colors.green : Colors.red,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        firebaseBusService.isConnected ? Icons.wifi : Icons.wifi_off,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        firebaseBusService.isConnected 
-                            ? 'Live Bus Tracking Active (${firebaseBusService.liveBuses.length} buses)'
-                            : 'Connecting to Live Bus Data...',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
             ),
           ),
 
@@ -989,9 +1014,9 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
 
-          // Zoom controls (+ / -)
+          // Zoom controls (+ / -) at top right
           Positioned(
-            top: 170,
+            top: 190,
             right: 16,
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1012,6 +1037,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: const Icon(Icons.remove, color: Color(0xFF8B0000)),
                 ),
               ],
+            ),
+          ),
+
+          // Reset map position button (bottom right, same level as search bus stops)
+          Positioned(
+            bottom: 30,
+            right: 16,
+            child: FloatingActionButton(
+              heroTag: 'reset_map',
+              mini: true,
+              backgroundColor: Colors.white,
+              onPressed: _resetMapPosition,
+              child: const Icon(Icons.my_location, color: Color(0xFF8B0000)),
             ),
           ),
 
@@ -1240,6 +1278,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _clockTimer?.cancel();
     _searchController.dispose();
     _detailsSheetController.dispose();
     _busesListSheetController.dispose();

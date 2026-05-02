@@ -236,7 +236,7 @@ class LocationService extends ChangeNotifier {
       final previousStop = currentStopId;
       _currentSegmentIndex = (_currentSegmentIndex + 1) % routeSize;
       
-      debugPrint('Mock driving: Reached stop ${nextStopId} (was at $previousStop). Moving to next segment.');
+      debugPrint('Mock driving: Reached stop $nextStopId (was at $previousStop). Moving to next segment.');
       
       // If completed full loop, we'll continue from the start
       if (_currentSegmentIndex >= routeSize) {
@@ -288,7 +288,7 @@ class LocationService extends ChangeNotifier {
       // Log progress occasionally (every 25% progress or at start)
       final progressPercent = (progressRatio * 100).round();
       if (progressPercent % 25 == 0 || progressRatio < 0.05) {
-        debugPrint('Mock driving: $progressPercent% to $nextStopId (${totalDistance.toStringAsFixed(0)}m away, segment ${_currentSegmentIndex + 1}/${routeSize})');
+        debugPrint('Mock driving: $progressPercent% to $nextStopId (${totalDistance.toStringAsFixed(0)}m away, segment ${_currentSegmentIndex + 1}/$routeSize)');
       }
     }
 
