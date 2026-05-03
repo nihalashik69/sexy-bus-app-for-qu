@@ -321,7 +321,7 @@ class BusService extends ChangeNotifier{
         name: 'Blue Route',
         description: 'Female Classrooms → Women\'s Activity → Library → Business',
         color: '#1976D2',
-        stopIds: ['female_classrooms', 'womens_activity_center', 'library', 'business'],
+        stopIds: ['D06', 'C05', 'H08', 'I06'],
         estimatedDuration: const Duration(minutes: 12),
       ),
       
@@ -331,7 +331,7 @@ class BusService extends ChangeNotifier{
         name: 'Light Blue Route',
         description: 'Female Classrooms → Women\'s Activity → Engineering',
         color: '#42A5F5',
-        stopIds: ['female_classrooms', 'womens_activity_center', 'engineering'],
+        stopIds: ['D06', 'C05', 'H07'],
         estimatedDuration: const Duration(minutes: 10),
       ),
       
@@ -341,7 +341,7 @@ class BusService extends ChangeNotifier{
         name: 'Dark Green Route',
         description: 'Female Classrooms → Women\'s Activity → Education',
         color: '#388E3C',
-        stopIds: ['female_classrooms', 'womens_activity_center', 'education'],
+        stopIds: ['D06', 'C05', 'I10'],
         estimatedDuration: const Duration(minutes: 8),
       ),
       
@@ -351,7 +351,7 @@ class BusService extends ChangeNotifier{
         name: 'Light Green Route',
         description: 'Female Classrooms → Women\'s Activity → Law',
         color: '#66BB6A',
-        stopIds: ['female_classrooms', 'womens_activity_center', 'law'],
+        stopIds: ['D06', 'C05', 'I09'],
         estimatedDuration: const Duration(minutes: 8),
       ),
       
@@ -361,7 +361,7 @@ class BusService extends ChangeNotifier{
         name: 'Purple Route',
         description: 'Female Classrooms → Al Razi → Ibn Al Baitar',
         color: '#7B1FA2',
-        stopIds: ['female_classrooms', 'al_razi', 'ibn_al_baitar'],
+        stopIds: ['D06', 'I06'],
         estimatedDuration: const Duration(minutes: 10),
       ),
       
@@ -371,7 +371,7 @@ class BusService extends ChangeNotifier{
         name: 'Pink Route',
         description: 'Women\'s Activity → Al Razi → Ibn Al Baitar',
         color: '#C2185B',
-        stopIds: ['womens_activity_center', 'al_razi', 'ibn_al_baitar'],
+        stopIds: ['C05', 'I06'],
         estimatedDuration: const Duration(minutes: 8),
       ),
       
@@ -381,7 +381,7 @@ class BusService extends ChangeNotifier{
         name: 'Orange Route',
         description: 'Tamyuz Simulation Center → Engineering → Law',
         color: '#F57C00',
-        stopIds: ['tamyuz_center', 'engineering', 'law'],
+        stopIds: ['I08', 'H07', 'I09'],
         estimatedDuration: const Duration(minutes: 10),
       ),
       
@@ -394,9 +394,9 @@ class BusService extends ChangeNotifier{
         description: 'Complete campus tour - 25 minutes',
         color: '#212121',
         stopIds: [
-          'metro', 'female_classrooms', 'ibn_al_baitar', 'tamyuz_center', 'law', 'education',
-          'students_affairs', 'business', 'engineering', 'research_complex',
-          'library', 'it_services', 'mens_foundation', 'al_razi'
+          'METRO', 'D06', 'I06', 'I08', 'I09', 'I10',
+          'I11', 'H08', 'H07', 'H10',
+          'B13', 'B03', 'A06'
         ],
         estimatedDuration: const Duration(minutes: 25),
       ),
@@ -408,8 +408,8 @@ class BusService extends ChangeNotifier{
         description: 'Inner campus loop - 18 minutes',
         color: '#FAFAFA',
         stopIds: [
-          'law', 'education', 'students_affairs', 'business',
-          'engineering', 'library', 'it_services'
+          'I09', 'I10', 'I11', 'H08',
+          'H07', 'B13', 'B03'
         ],
         estimatedDuration: const Duration(minutes: 18),
       ),
@@ -420,7 +420,7 @@ class BusService extends ChangeNotifier{
         name: 'Brown Line (Research & Sports)',
         description: 'Research complex and sports facilities - 15 minutes',
         color: '#5D4037',
-        stopIds: ['metro', 'research_complex', 'library', 'it_services', 'sports_facilities'],
+        stopIds: ['METRO', 'H10', 'B13', 'B03', 'A07'],
         estimatedDuration: const Duration(minutes: 15),
       ),
       
@@ -430,7 +430,7 @@ class BusService extends ChangeNotifier{
         name: 'Maroon Line (Express)',
         description: 'Quick express route - 8 minutes',
         color: '#8D6E63',
-        stopIds: ['metro', 'business', 'engineering'],
+        stopIds: ['METRO', 'H08', 'H07'],
         estimatedDuration: const Duration(minutes: 8),
       ),
     ]);
