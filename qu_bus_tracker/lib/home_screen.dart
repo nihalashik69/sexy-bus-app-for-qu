@@ -22,6 +22,7 @@ import 'bus_models.dart';
 import 'firebase_bus_service.dart';
 import 'location_service.dart';
 import 'maps_config.dart';
+import 'schedule_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final String gender;
@@ -47,6 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, String?> _stopGenders = {};
   Timer? _clockTimer;
   String _currentTime = '';
+  final ScheduleService _scheduleService = ScheduleService();
+  Map<String, List<int>> _stopSchedule = {};
+  bool _isLoadingSchedule = false;
 
   // Qatar University campus bounds
   static const LatLng _quCenter = LatLng(25.376453, 51.488121);
@@ -71,6 +75,104 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _currentTime = '$hour:$minute $period';
     });
+  }
+
+  Future<void> _loadStopSchedule(String stopId) async {
+  setState(() {
+    _isLoadingSchedule = true;
+    _stopSchedule = {};
+  });
+
+  print("REQUESTING STOP ID: $stopId");
+
+  final scheduleData = await _scheduleService.getStopSchedule(stopId);
+
+  if (scheduleData != null && mounted) {
+    final nextBuses = _scheduleService.getNextBuses(scheduleData);
+    setState(() {
+      _stopSchedule = nextBuses;
+      _isLoadingSchedule = false;
+    });
+  } else if (mounted) {
+    print("NO DATA FOUND FOR: $stopId");
+    setState(() {
+      _isLoadingSchedule = false;
+    });
+  }
+}
+
+  Widget _buildScheduleContent() {
+    if (_isLoadingSchedule) {
+      return const Padding(
+        padding: EdgeInsets.all(20),
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8B0000)),
+          ),
+        ),
+      );
+    }
+
+    if (_stopSchedule.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(20),
+        child: Text(
+          'No schedule data available',
+          style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Upcoming Buses',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2C2C2C),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ..._stopSchedule.entries.map((entry) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.key,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF8B0000),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: entry.value.map((minutes) {
+                      final eta = _scheduleService.getMinutesUntilArrival(minutes);
+                      return Text(
+                        '${_scheduleService.formatMinutes(minutes)} ($eta min)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF8B0000),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
   }
 
   @override
@@ -332,31 +434,42 @@ class _HomeScreenState extends State<HomeScreen> {
               title: location,
               snippet: 'Tap to select as destination',
             ),
-            onTap: () {
-              setState(() {
-                _selectedMarkerLocation = location;
-                _selectedDestination = location;
-                _showAllBuses = false; // Hide live buses button when building marker is selected
-              });
-              // Close buses list if open
-              if (_busesListSheetController.isAttached) {
-                _busesListSheetController.animateTo(
-                  0.0,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeIn,
-                );
-              }
-              // Open the details sheet (will be created in build if _selectedMarkerLocation is not null)
-              Future.delayed(const Duration(milliseconds: 100), () {
-                if (_detailsSheetController.isAttached && mounted) {
-                  _detailsSheetController.animateTo(
-                    0.3, // Initial height (30% of screen)
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOut,
-                  );
-                }
-              });
-            },
+onTap: () {
+  final busService = Provider.of<BusService>(context, listen: false);
+
+  final stop = busService.getAllStops().firstWhere(
+    (s) => s.name == location,
+  );
+
+  print("STOP NAME: ${stop.name}");
+  print("STOP ID: ${stop.id}");
+
+  setState(() {
+    _selectedMarkerLocation = location;
+    _selectedDestination = location;
+    _showAllBuses = false;
+  });
+
+  _loadStopSchedule(stop.id); // ✅ NOW CORRECT
+
+  if (_busesListSheetController.isAttached) {
+    _busesListSheetController.animateTo(
+      0.0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeIn,
+    );
+  }
+
+  Future.delayed(const Duration(milliseconds: 100), () {
+    if (_detailsSheetController.isAttached && mounted) {
+      _detailsSheetController.animateTo(
+        0.3,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  });
+}
           ),
         );
       }
@@ -995,6 +1108,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
+                              // Schedule display
+                              _buildScheduleContent(),
                               const SizedBox(height: 20),
                               // Additional route information can go here
                               Text(

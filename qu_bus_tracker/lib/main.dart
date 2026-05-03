@@ -15,10 +15,9 @@ import 'firebase_bus_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Firebase with error handling
+  // Initialize Firebase
   try {
     await Firebase.initializeApp();
-    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     // Continue anyway - app will work with mock data

@@ -45,7 +45,7 @@ class BusService extends ChangeNotifier{
     _stops.addAll([
 // Metro Station (Main Hub) - All genders
       BusStop(
-        id: 'metro',
+        id: 'METRO',
         name: 'Metro Station',
         description: 'Main QU Metro Station',
         location: const LatLng(25.381821556363867, 51.493005795317956),
@@ -55,7 +55,7 @@ class BusService extends ChangeNotifier{
       
       // Female Classrooms Building (D06) - Female Only
       BusStop(
-        id: 'female_classrooms',
+        id: 'D06',
         name: 'D06 Female Classrooms Building (GCR)',
         description: 'D06 - Female Classrooms Building',
         location: const LatLng(25.373481982344842, 51.4857422195123),
@@ -65,7 +65,7 @@ class BusService extends ChangeNotifier{
       
       // Women's Activity Center (C05) - Female Only
       BusStop(
-        id: 'womens_activity_center',
+        id: 'C05',
         name: 'C05 Women\'s Activity Building',
         description: 'C05 - Women\'s Activity Building',
         location: const LatLng(25.372089099584354, 51.488961932841086),
@@ -75,7 +75,7 @@ class BusService extends ChangeNotifier{
         
       // Ibn Al Baitar Building (I06) - All genders
       BusStop(
-        id: 'ibn_al_baitar',
+        id: 'I06',
         name: 'I06 College of Pharmacy (Ibn Al-Baitar)',
         description: 'I06 - College of Pharmacy / Health Sciences',
         location: const LatLng(25.380643787796444, 51.481912360606444),
@@ -85,7 +85,7 @@ class BusService extends ChangeNotifier{
       
       // Tamyuz Simulation Center (I08) - All genders
       BusStop(
-        id: 'tamyuz_center',
+        id: 'I08',
         name: 'I08 Tamayuz Simulation Center',
         description: 'I08 - Tamayuz Simulation Center',
         location: const LatLng(25.37988015721793, 51.482720527517),
@@ -95,7 +95,7 @@ class BusService extends ChangeNotifier{
       
       // Research Complex (H10) - All genders
       BusStop(
-        id: 'research_complex',
+        id: 'H10',
         name: 'H10 Research Complex',
         description: 'H10 - Research Complex',
         location: const LatLng(25.379627085925716, 51.49016028066605),
@@ -105,7 +105,7 @@ class BusService extends ChangeNotifier{
       
       // Information Technology Services (B03) - All genders
       BusStop(
-        id: 'it_services',
+        id: 'B03',
         name: 'B03 Information Technology Services',
         description: 'B03 - ITS Building',
         location: const LatLng(25.37524774172289, 51.492901227889526),
@@ -115,7 +115,7 @@ class BusService extends ChangeNotifier{
       
       // Men's Foundation Building (A06) - Male Only
       BusStop(
-        id: 'mens_foundation',
+        id: 'A06',
         name: 'A06 Men\'s Foundation Building',
         description: 'A06 - Men\'s Foundation Building',
         location: const LatLng(25.378124440299285, 51.49158060045566),
@@ -125,7 +125,7 @@ class BusService extends ChangeNotifier{
       
       // Sports Facilities Department (A07) - All genders
       BusStop(
-        id: 'sports_facilities',
+        id: 'A07',
         name: 'A07 Sports Facilities and Events Department',
         description: 'A07 - Sports Facilities and Events Department',
         location: const LatLng(25.377296788397643, 51.49312032574497),
@@ -137,7 +137,7 @@ class BusService extends ChangeNotifier{
 
       // College of Law - Male
       BusStop(
-        id: 'law_male',
+        id: 'I09',
         name: 'I09 College of Law (Male)',
         description: 'I09 - College of Law (Male)',
         location: const LatLng(25.376087457119596, 51.48069196590328),
@@ -146,7 +146,7 @@ class BusService extends ChangeNotifier{
       ),
       // College of Law - Female
       BusStop(
-        id: 'law_female',
+        id: 'I09',
         name: 'I09 College of Law (Female)',
         description: 'I09 - College of Law (Female)',
         location: const LatLng(25.374783619645747, 51.481530834481795),
@@ -156,7 +156,7 @@ class BusService extends ChangeNotifier{
 
       // College of Education - Male
       BusStop(
-        id: 'education_male',
+        id: 'I10',
         name: 'I10 College of Education Building (Male)',
         description: 'I10 - College of Education Building (Male)',
         location: const LatLng(25.37658898975716, 51.4828877414271),
@@ -165,7 +165,7 @@ class BusService extends ChangeNotifier{
       ),
       // College of Education - Female
       BusStop(
-        id: 'education_female',
+        id: 'I10',
         name: 'I10 College of Education Building (Female)',
         description: 'I10 - College of Education Building (Female)',
         location: const LatLng(25.37560672476257, 51.48242239454162),
@@ -175,7 +175,7 @@ class BusService extends ChangeNotifier{
 
       // Student Affairs - Male
       BusStop(
-        id: 'students_affairs_male',
+        id: 'I11',
         name: 'I11 Student Affairs Building (Male)',
         description: 'I11 - Student Affairs Building (Male)',
         location: const LatLng(25.377979388163364, 51.48388511757748),
@@ -184,7 +184,7 @@ class BusService extends ChangeNotifier{
       ),
       // Student Affairs - Female
       BusStop(
-        id: 'students_affairs_female',
+        id: 'I11',
         name: 'I11 Student Affairs Building (Female)',
         description: 'I11 - Student Affairs Building (Female)',
         location: const LatLng(25.376323831360903, 51.48494350153811),
@@ -194,7 +194,7 @@ class BusService extends ChangeNotifier{
 
       // College of Nursing - All genders
       BusStop(
-        id: 'nursing',
+        id: 'I03',
         name: 'I03 College of Nursing',
         description: 'I03 - College of Nursing',
         location: const LatLng(25.378817713816293, 51.48342119215998),
@@ -204,7 +204,7 @@ class BusService extends ChangeNotifier{
 
       // College of Business and Economics - Male
       BusStop(
-        id: 'business_male',
+        id: 'H08',
         name: 'H08 College of Business and Economics (Male)',
         description: 'H08 - College of Business and Economics (Male)',
         location: const LatLng(25.378627213100078, 51.485784586139374),
@@ -213,7 +213,7 @@ class BusService extends ChangeNotifier{
       ),
       // College of Business and Economics - Female
       BusStop(
-        id: 'business_female',
+        id: 'H08',
         name: 'H08 College of Business and Economics (Female)',
         description: 'H08 - College of Business and Economics (Female)',
         location: const LatLng(25.3767535825156, 51.48698055938411),
@@ -223,7 +223,7 @@ class BusService extends ChangeNotifier{
 
       // College of Engineering - Male
       BusStop(
-        id: 'engineering_male',
+        id: 'H07',
         name: 'H07 College Of Engineering (Male)',
         description: 'H07 - College Of Engineering (Male)',
         location: const LatLng(25.380083667560896, 51.48692088481661),
@@ -232,7 +232,7 @@ class BusService extends ChangeNotifier{
       ),
       // College of Engineering - Female
       BusStop(
-        id: 'engineering_female',
+        id: 'H07',
         name: 'H07 College Of Engineering (Female)',
         description: 'H07 - College Of Engineering (Female)',
         location: const LatLng(25.378934489421194, 51.48663916055145),
@@ -242,7 +242,7 @@ class BusService extends ChangeNotifier{
 
       // College Of Medicine - All genders
       BusStop(
-        id: 'college_of_medicine',
+        id: 'H12',
         name: 'H12 College Of Medicine',
         description: 'H12 - College Of Medicine',
         location: const LatLng(25.38046481732248, 51.491811717125984),
@@ -252,7 +252,7 @@ class BusService extends ChangeNotifier{
 
       // Library - Male
       BusStop(
-        id: 'library_male',
+        id: 'B13',
         name: 'B13 Library (Male)',
         description: 'B13 - Library (Male)',
         location: const LatLng(25.377661503696263, 51.49047014057098),
@@ -261,7 +261,7 @@ class BusService extends ChangeNotifier{
       ),
 // Library - Female
       BusStop(
-        id: 'library_female',
+        id: 'B13',
         name: 'B13 Library (Female)',
         description: 'B13 - Library (Female)',
         location: const LatLng(25.37750423808213, 51.488897080467154),
@@ -271,7 +271,7 @@ class BusService extends ChangeNotifier{
 
       // Women's Foundation (D05) - Female Only
       BusStop(
-        id: 'womens_foundation',
+        id: 'D05',
         name: 'D05 Women\'s Foundation',
         description: 'D05 - Women\'s Foundation',
         location: const LatLng(25.374760002402123, 51.48711292847968),
@@ -281,7 +281,7 @@ class BusService extends ChangeNotifier{
 
       // Women's Food Court (D04) - Female Only
       BusStop(
-        id: 'womens_food_court',
+        id: 'D04',
         name: 'D04 Women\'s Food Court',
         description: 'D04 - Women\'s Food Court',
         location: const LatLng(25.37367115319947, 51.48777028639902),
@@ -291,7 +291,7 @@ class BusService extends ChangeNotifier{
 
       // College of Sharia & Islamic Studies (C11) - Female Only
       BusStop(
-        id: 'sharia_a',
+        id: 'C11',
         name: 'C11 College of Sharia & Islamic Studies (Bldn A)',
         description: 'C11 - College of Sharia & Islamic Studies (Building A)',
         location: const LatLng(25.374296317071014, 51.48757258895679),
@@ -301,7 +301,7 @@ class BusService extends ChangeNotifier{
 
       // College of Sharia & Islamic Studies (C07) - Female Only
       BusStop(
-        id: 'sharia_b',
+        id: 'C07',
         name: 'C07 College of Sharia & Islamic Studies (Bldn B)',
         description: 'C07 - College of Sharia & Islamic Studies (Building B)',
         location: const LatLng(25.373260616357925, 51.48825006414136),
