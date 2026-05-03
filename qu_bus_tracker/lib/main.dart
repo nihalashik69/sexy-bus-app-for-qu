@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'gender_selection_screen.dart';
 import 'bus_service.dart';
 import 'firebase_bus_service.dart';
@@ -17,6 +18,7 @@ void main() async {
   // Initialize Firebase with error handling
   try {
     await Firebase.initializeApp();
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     // Continue anyway - app will work with mock data
