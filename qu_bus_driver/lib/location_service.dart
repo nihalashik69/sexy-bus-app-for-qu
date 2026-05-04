@@ -101,44 +101,43 @@ class LocationService extends ChangeNotifier {
 
   // Route stop coordinates (QU campus coordinates) - Matches tracker app accurate locations
   static const Map<String, Map<String, double>> _routeStops = {
-    'metro': {'lat': 25.381821556363867, 'lng': 51.493005795317956},
-    'female_classrooms': {'lat': 25.372171648170337, 'lng': 51.48486476066063},
-    'womens_activity_center': {'lat': 25.373318147272293, 'lng': 51.48752343321898},
-    'library': {'lat': 25.377533689714024, 'lng': 51.49026714070395},
-    'business': {'lat': 25.378395383948423, 'lng': 51.485941885442955},
-    'engineering': {'lat': 25.379161874420934, 'lng': 51.48791360317812},
-    'education': {'lat': 25.375778325356464, 'lng': 51.48285963578254},
-    'law': {'lat': 25.37498601479011, 'lng': 51.48144259906941},
-    'al_razi': {'lat': 25.373318147272293, 'lng': 51.48752343321898}, // Approximate location
-    'ibn_al_baitar': {'lat': 25.37498601479011, 'lng': 51.48144259906941}, // Approximate location
-    'tamyuz_center': {'lat': 25.375778325356464, 'lng': 51.48285963578254}, // Approximate location
-    'students_affairs': {'lat': 25.377069189896087, 'lng': 51.48474121692091},
-    'research_complex': {'lat': 25.379784924283847, 'lng': 51.4898780698433},
-    'it_services': {'lat': 25.374577061639478, 'lng': 51.49314222276258},
-    'mens_foundation': {'lat': 25.378368563094583, 'lng': 51.49158593932738},
-    'sports_facilities': {'lat': 25.377006581555843, 'lng': 51.493157551764284},
+    'METRO': {'lat': 25.381821556363867, 'lng': 51.493005795317956},
+    'D06': {'lat': 25.372171648170337, 'lng': 51.48486476066063},
+    'C05': {'lat': 25.373318147272293, 'lng': 51.48752343321898},
+    'B13': {'lat': 25.377533689714024, 'lng': 51.49026714070395},
+    'H08': {'lat': 25.378395383948423, 'lng': 51.485941885442955},
+    'H07': {'lat': 25.379161874420934, 'lng': 51.48791360317812},
+    'I10': {'lat': 25.375778325356464, 'lng': 51.48285963578254},
+    'I09': {'lat': 25.37498601479011, 'lng': 51.48144259906941},
+    'I06': {'lat': 25.373318147272293, 'lng': 51.48752343321898}, // Approximate location
+    'I08': {'lat': 25.375778325356464, 'lng': 51.48285963578254}, // Approximate location
+    'I11': {'lat': 25.377069189896087, 'lng': 51.48474121692091},
+    'H10': {'lat': 25.379784924283847, 'lng': 51.4898780698433},
+    'B03': {'lat': 25.374577061639478, 'lng': 51.49314222276258},
+    'A06': {'lat': 25.378368563094583, 'lng': 51.49158593932738},
+    'A07': {'lat': 25.377006581555843, 'lng': 51.493157551764284},
   };
 
   // Route definitions with stop sequences
   static const Map<String, List<String>> _routes = {
-    'blue_route': ['female_classrooms', 'womens_activity_center', 'library', 'business'],
-    'light_blue_route': ['female_classrooms', 'womens_activity_center', 'engineering'],
-    'dark_green_route': ['female_classrooms', 'womens_activity_center', 'education'],
-    'light_green_route': ['female_classrooms', 'womens_activity_center', 'law'],
-    'purple_route': ['female_classrooms', 'al_razi', 'ibn_al_baitar'],
-    'pink_route': ['womens_activity_center', 'al_razi', 'ibn_al_baitar'],
-    'orange_route': ['tamyuz_center', 'engineering', 'law'],
+    'blue_route': ['D06', 'C05', 'B13', 'H08'],
+    'light_blue_route': ['D06', 'C05', 'H07'],
+    'dark_green_route': ['D06', 'C05', 'I10'],
+    'light_green_route': ['D06', 'C05', 'I09'],
+    'purple_route': ['D06', 'I06'],
+    'pink_route': ['C05', 'I06'],
+    'orange_route': ['I08', 'H07', 'I09'],
     'black_line': [
-      'metro', 'female_classrooms', 'ibn_al_baitar', 'tamyuz_center', 'law', 'education',
-      'students_affairs', 'business', 'engineering', 'research_complex',
-      'library', 'it_services', 'mens_foundation', 'al_razi'
+      'METRO', 'D06', 'I06', 'I08', 'I09', 'I10',
+      'I11', 'H08', 'H07', 'H10',
+      'B13', 'B03', 'A06'
     ],
     'white_line': [
-      'law', 'education', 'students_affairs', 'business',
-      'engineering', 'library', 'it_services'
+      'I09', 'I10', 'I11', 'H08',
+      'H07', 'B13', 'B03'
     ],
-    'brown_line': ['metro', 'research_complex', 'library', 'it_services', 'sports_facilities'],
-    'maroon_line': ['metro', 'business', 'engineering'],
+    'brown_line': ['METRO', 'H10', 'B13', 'B03', 'A07'],
+    'maroon_line': ['METRO', 'H08', 'H07'],
   };
 
   int _currentRouteIndex = 0;

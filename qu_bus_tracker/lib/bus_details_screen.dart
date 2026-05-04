@@ -19,6 +19,50 @@ import 'package:provider/provider.dart';
 import 'bus_models.dart';
 import 'bus_service.dart';
 import 'firebase_bus_service.dart';
+import 'schedule_service.dart';
+
+const Map<String, LatLng> stopCoordinates = {
+  // I series
+  'I09m': LatLng(25.376087457119596, 51.48069196590328),
+  'I09f': LatLng(25.374783619645747, 51.481530834481795),
+
+  'I10m': LatLng(25.37658898975716, 51.4828877414271),
+  'I10f': LatLng(25.37560672476257, 51.48242239454162),
+
+  'I11m': LatLng(25.377979388163364, 51.48388511757748),
+  'I11f': LatLng(25.376323831360903, 51.48494350153811),
+
+  'I03': LatLng(25.378817713816293, 51.48342119215998),
+  'I06': LatLng(25.380643787796444, 51.481912360606444),
+  'I08': LatLng(25.37988015721793, 51.482720527517),
+
+  // H series
+  'H08m': LatLng(25.378627213100078, 51.485784586139374),
+  'H08f': LatLng(25.3767535825156, 51.48698055938411),
+
+  'H07m': LatLng(25.380083667560896, 51.48692088481661),
+  'H07f': LatLng(25.378934489421194, 51.48663916055145),
+
+  'H10': LatLng(25.379627085925716, 51.49016028066605),
+  'H12': LatLng(25.38046481732248, 51.491811717125984),
+
+  // A / B / C / D
+  'A06': LatLng(25.378124440299285, 51.49158060045566),
+  'A07': LatLng(25.377296788397643, 51.49312032574497),
+
+  'B13m': LatLng(25.377661503696263, 51.49047014057098),
+  'B13f': LatLng(25.37750423808213, 51.488897080467154),
+
+  'B03': LatLng(25.37524774172289, 51.492901227889526),
+
+  'D05': LatLng(25.374760002402123, 51.48711292847968),
+  'D06': LatLng(25.373481982344842, 51.4857422195123),
+  'D04': LatLng(25.37367115319947, 51.48777028639902),
+
+  'C11': LatLng(25.374296317071014, 51.48757258895679),
+  'C07': LatLng(25.373260616357925, 51.48825006414136),
+  'C05': LatLng(25.372089099584354, 51.488961932841086),
+};
 
 class BusDetailsScreen extends StatefulWidget {
   final String destination;
@@ -42,15 +86,79 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
   // Store departure minutes (1-5) for buses when they go below 1 minute
   final Map<String, int> _departureMinutes = {};
   final Random _random = Random();
+  final ScheduleService _scheduleService = ScheduleService();
+  Map<String, dynamic>? _stopScheduleData = null;
+  bool _isLoadingSchedule = false;
+  Map<String, List<int>> _stopSchedule = {};
+  bool isLightColor(Color color) {
+  return color.computeLuminance() > 0.85;
+  }
+  String getScheduleKeyForRoute(String routeName) {
+    final name = routeName.toLowerCase();
+  final ScheduleService _scheduleService = ScheduleService();
+  final stopId = _getStopIdFromName(widget.destination);
+  final target = stopCoordinates[stopId] ?? const LatLng(25.3700, 51.4831);
+
+  if (name.contains('black')) return 'male black';
+  if (name.contains('white')) return 'male white';
+  if (name.contains('maroon')) return 'male maroon';
+  if (name.contains('brown')) return 'male brown';
+
+  if (name.contains('orange')) return 'female orange';
+  if (name.contains('light blue')) return 'female light blue';
+  if (name.contains('blue')) return 'female blue';
+  if (name.contains('dark green')) return 'female dark green';
+  if (name.contains('light green')) return 'female light green';
+  if (name.contains('pink')) return 'female pink';
+  if (name.contains('purple')) return 'female purple';
+  if (name.contains('zone a')) return 'female zone a';
+  if (name.contains('zone b')) return 'female zone b';
+  if (name.contains('zone c')) return 'female zone c';
+  if (name.contains('red')) return 'female red';
+  if (name.contains('metro a')) return 'female metro a';
+  if (name.contains('metro b')) return 'female metro b';
+  if (name.contains('metro c')) return 'female metro c';
+
+    return '';
+  }
+
+
+
+  final Map<String, int> routeBusCount = {
+  // female
+  'female light blue': 4,
+  'female blue': 3,
+  'female dark green': 5,
+  'female light green': 3,
+  'female purple': 2,
+  'female pink': 3,
+  'female orange': 3,
+  'female zone a': 4,
+  'female zone b': 5,
+
+  // metro
+  'female metro a': 2,
+  'female metro b': 2,
+  'female metro c': 2,
+
+  // male
+  'male black': 3,
+  'male white': 2,
+  'male brown': 3,
+  'male maroon': 2,
+};
+
+
+
 
   @override
   void initState() {
     super.initState();
-    // Defer work that uses `context` to the first frame to avoid initState context issues
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadBusData();
-    });
-  }
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _loadBusData();     // loads routes + buses
+    _loadSchedule();    // loads schedule
+  });
+}
 
   Future<void> _loadBusData() async {
     final busService = Provider.of<BusService>(context, listen: false);
@@ -83,6 +191,124 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
 
     // Listen to Firebase bus updates (FirebaseBusService is a ChangeNotifier)
     firebaseBusService.addListener(_updateBusesFromFirebase);
+
+    // Load schedule data for the destination
+    if (widget.destination != null) {
+      _loadSchedule();
+    }
+  }
+
+  String _getStopIdFromName(String name) {
+    final busService = Provider.of<BusService>(context, listen: false);
+    for (final stop in busService.getAllStops()) {
+      if (stop.name.toLowerCase() == name.toLowerCase()) {
+        return stop.id;
+      }
+    }
+    return name;
+  }
+
+  Future<void> _loadSchedule() async {
+    setState(() => _isLoadingSchedule = true);
+    final stopId = _getStopIdFromName(widget.destination);
+    final rawData = await _scheduleService.getStopSchedule(stopId);
+    if (mounted && rawData != null) {
+      final processed = _scheduleService.getNextBuses(rawData);
+      setState(() {
+        _stopScheduleData = rawData;
+        _stopSchedule = processed;
+        _isLoadingSchedule = false;
+      });
+    } else if (mounted) {
+      setState(() => _isLoadingSchedule = false);
+    }
+  }
+
+  Widget _buildScheduleContent() {
+    if (_isLoadingSchedule) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_stopSchedule.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        const Text(
+          'Schedule',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1F2933),
+          ),
+        ),
+        const SizedBox(height: 12),
+        ..._stopSchedule.entries.map((entry) {
+          final routeId = entry.key;
+          final arrivals = entry.value;
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  routeId,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: arrivals.take(4).map((minutes) {
+                    final displayText = '$minutes ${minutes == 1 ? 'min' : 'mins'}';
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        displayText,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ],
+    );
   }
   
   void _updateBuses() {
@@ -349,6 +575,10 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final destination = widget.destination;
+    final stopId = _getStopIdFromName(widget.destination);
+
+final target =
+    stopCoordinates[stopId] ?? const LatLng(25.3700, 51.4831);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F5F7),
@@ -385,16 +615,23 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                     ),
                     child: GoogleMap(
                       onMapCreated: (GoogleMapController controller) {
-                        _mapController = controller;
-                      },
-                      initialCameraPosition: const CameraPosition(
-                        target: LatLng(25.3700, 51.4831), // QU Campus center
-                        zoom: 16.0,
-                      ),
+  _mapController = controller;
+
+  Future.delayed(const Duration(milliseconds: 300), () {
+    _mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(target, 17.5),
+    );
+  });
+},
+                      initialCameraPosition: CameraPosition(
+  target: target,
+  zoom: 17.5,
+),
                       markers: _getMarkers(),
                       myLocationEnabled: true,
                       myLocationButtonEnabled: false,
                       zoomControlsEnabled: false,
+                      mapType: MapType.satellite,
                     ),
                   ),
                 ),
@@ -467,6 +704,13 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                               int.parse(route.color.substring(1), radix: 16) +
                                   0xFF000000,
                             );
+                            final isLight = isLightColor(routeColor);
+                            final scheduleKey = getScheduleKeyForRoute(route.name);
+
+                            final hasSchedule = scheduleKey.isNotEmpty && _stopSchedule.containsKey(scheduleKey);
+
+                            final times = hasSchedule ? _stopSchedule[scheduleKey]! : [];
+                            final count = routeBusCount[scheduleKey] ?? 0;
 
                             return Container(
                               margin: const EdgeInsets.only(bottom: 16),
@@ -490,7 +734,7 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                                       vertical: 14,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: routeColor,
+                                      color: isLight ? const Color(0xFFF5F7FA) : routeColor,
                                       borderRadius: const BorderRadius.vertical(
                                         top: Radius.circular(18),
                                       ),
@@ -499,9 +743,9 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.route,
-                                          color: Colors.white,
+                                          color: isLight ? const Color(0xFF1F2933) : Colors.white,
                                           size: 20,
                                         ),
                                         const SizedBox(width: 10),
@@ -512,10 +756,10 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                                             children: [
                                               Text(
                                                 route.name,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w700,
-                                                  color: Colors.white,
+                                                  color: isLight ? const Color(0xFF1F2933) : Colors.white,
                                                 ),
                                               ),
                                               if (route.description.isNotEmpty)
@@ -524,9 +768,11 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                                                   maxLines: 2,
                                                   overflow:
                                                       TextOverflow.ellipsis,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 12,
-                                                    color: Colors.white70,
+                                                    color: isLight
+    ? const Color(0xFF6B7280)
+    : Colors.white70,
                                                   ),
                                                 ),
                                             ],
@@ -545,43 +791,84 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                                                 BorderRadius.circular(999),
                                           ),
                                           child: Text(
-                                            '${buses.length} bus${buses.length == 1 ? '' : 'es'}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white,
-                                            ),
-                                          ),
+  '$count buses',
+  style: TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    color: isLight ? const Color(0xFF1F2933) : Colors.white,
+  ),
+),
                                         ),
                                       ],
                                     ),
                                   ),
 
+                                  // Schedule inside route card
+                                  if (hasSchedule)
+  Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    child: Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: times.take(4).map((t) {
+        final eta = _scheduleService.getMinutesUntilArrival(t);
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+  color: isLight
+    ? const Color(0xFFF1F5F9) // brighter, cleaner grey
+      : routeColor.withOpacity(0.12),
+  borderRadius: BorderRadius.circular(999),
+  border: Border.all(
+    color: isLight
+        ? const Color(0xFFD0D5DD)
+        : routeColor.withOpacity(0.25),
+  ),
+),
+          child: Text(
+            '$eta min',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isLight
+    ? const Color(0xFF344054)
+    : routeColor,
+            ),
+          ),
+        );
+      }).toList(),
+    ),
+  ),
+
                                   // Bus list area
                                   Container(
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.vertical(
-                                        bottom: Radius.circular(18),
-                                      ),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: const BorderRadius.vertical(
+      bottom: Radius.circular(18),
+    ),
+    border: Border.all(
+      color: const Color(0xFFE4E7EB),
+      width: 1,
+    ),
+  ),
+  padding: const EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 12,
                                     ),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 12,
-                                    ),
-                                    child: buses.isEmpty
-                                        ? const Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 4),
-                                            child: Text(
-                                              'No buses currently running on this route',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Color(0xFF9AA5B1),
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                            ),
-                                          )
+                                    child: (buses.isEmpty && !hasSchedule)
+    ? const Padding(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        child: Text(
+          'No buses currently running on this route',
+          style: TextStyle(
+            fontSize: 12,
+            color: Color(0xFF9AA5B1),
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      )
                                         : Column(
                                             children: buses.map((bus) {
                                               return Container(
@@ -797,6 +1084,7 @@ class _BusDetailsScreenState extends State<BusDetailsScreen> {
                           },
                         ),
                 ),
+
               ],
             ),
     );
